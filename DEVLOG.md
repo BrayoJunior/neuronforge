@@ -1,1 +1,7 @@
 ﻿# NeuronForge Development Notes
+
+## Week 1: Architecture & Foundation (April 17-23)
+
+### April 17
+- Researched 0G ecosystem: Compute, Storage, Chain
+- Designed OpenClaw-compatible ReAct runtime architecture

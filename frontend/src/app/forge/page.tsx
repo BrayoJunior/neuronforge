@@ -27,6 +27,15 @@ interface Agent {
   skills: string[];
   model: string;
   stateHash?: string;
+  tools?: string[];
+}
+
+interface ReActStep {
+  type: "thought" | "action" | "response" | "error";
+  content?: string;
+  tool?: string;
+  input?: Record<string, unknown>;
+  output?: unknown;
 }
 
 interface ChatMessage {
@@ -35,7 +44,9 @@ interface ChatMessage {
   timestamp: number;
   verified?: boolean;
   model?: string;
+  steps?: ReActStep[];
 }
+
 
 export default function ForgePage() {
   // Builder state
@@ -139,11 +150,12 @@ export default function ForgePage() {
         timestamp: Date.now(),
         verified: data.verified,
         model: data.model,
+        steps: data.steps,
       }]);
     } catch {
       setMessages((prev) => [...prev, {
         role: "assistant",
-        content: "I'm currently running in demo mode. Connect the backend server (`npm run dev` in `/backend`) and configure your 0G Compute provider to enable live inference.\n\nOnce connected, I'll reason through 0G's decentralized compute network with TEE verification!",
+        content: "I'm currently running in demo mode. Start the backend server (`npm run dev` in `/backend`) and configure your 0G Compute provider to enable live inference.\n\nOnce connected, I'll reason through 0G's decentralized compute network with TEE verification!",
         timestamp: Date.now(),
       }]);
     } finally {
@@ -368,9 +380,64 @@ export default function ForgePage() {
           {messages.map((msg, i) => (
             <div key={i} className={`chat-message ${msg.role}`}>
               <div style={{ whiteSpace: "pre-wrap" }}>{msg.content}</div>
+              
+              {/* ReAct Steps Visualization */}
+              {msg.steps && msg.steps.length > 0 && (
+                <div style={{
+                  marginTop: "0.75rem",
+                  padding: "0.75rem",
+                  background: "rgba(0,0,0,0.2)",
+                  borderRadius: "8px",
+                  fontSize: "0.8rem",
+                  borderLeft: "2px solid var(--accent-primary)",
+                }}>
+                  <div style={{ fontWeight: 700, marginBottom: "0.5rem", color: "var(--accent-primary)" }}>
+                    🔄 ReAct Reasoning Chain
+                  </div>
+                  {msg.steps.map((step, j) => (
+                    <div key={j} style={{ marginBottom: "0.4rem", paddingLeft: "0.5rem" }}>
+                      {step.type === "thought" && (
+                        <div style={{ color: "var(--accent-secondary)" }}>
+                          💭 <em>{step.content}</em>
+                        </div>
+                      )}
+                      {step.type === "action" && (
+                        <div>
+                          <div style={{ color: "#f59e0b" }}>
+                            🔧 Tool: <strong>{step.tool}</strong>
+                          </div>
+                          {step.output != null && (
+                            <div style={{
+                              marginTop: "0.25rem",
+                              padding: "0.4rem",
+                              background: "rgba(0,0,0,0.3)",
+                              borderRadius: "4px",
+                              fontFamily: "var(--font-mono)",
+                              fontSize: "0.75rem",
+                              color: "#22c55e",
+                              maxHeight: "100px",
+                              overflow: "auto",
+                            }}>
+                              {typeof step.output === "string"
+                                ? step.output
+                                : JSON.stringify(step.output, null, 2)}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {step.type === "error" && (
+                        <div style={{ color: "var(--accent-tertiary)" }}>
+                          ❌ {step.content}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {msg.verified !== undefined && (
                 <div style={{ marginTop: "0.5rem", fontSize: "0.7rem", opacity: 0.7 }}>
-                  {msg.verified ? "✅ TEE Verified" : "⚠️ Unverified"} • {msg.model}
+                  {msg.verified ? "✅ TEE Verified" : "⚠️ Unverified"} • {msg.model} • via 0G Compute
                 </div>
               )}
             </div>

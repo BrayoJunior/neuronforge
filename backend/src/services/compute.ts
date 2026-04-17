@@ -101,7 +101,7 @@ export async function chatCompletion(
     throw new Error(`0G Compute inference failed: ${response.status} ${response.statusText}`);
   }
 
-  const data = await response.json();
+  const data: any = await response.json();
   const content = data.choices[0].message.content;
 
   // Verify response integrity via TEE signature
@@ -109,7 +109,7 @@ export async function chatCompletion(
   const chatID = response.headers.get('ZG-Res-Key') || data.id;
   if (chatID) {
     try {
-      verified = await b.inference.processResponse(providerAddress, chatID);
+      verified = !!(await b.inference.processResponse(providerAddress, chatID));
     } catch (e) {
       console.warn('⚠️ Response verification skipped:', (e as Error).message);
     }

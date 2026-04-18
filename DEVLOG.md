@@ -5,3 +5,6 @@
 ### April 17
 - Researched 0G ecosystem: Compute, Storage, Chain
 - Designed OpenClaw-compatible ReAct runtime architecture
+
+### April 18
+- Set up monorepo: frontend, backend, contracts, skills

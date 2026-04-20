@@ -11,3 +11,4 @@
 
 ### April 20
 - Drafted AgentRegistry.sol and NeuronForgeINFT.sol
+- Researched ERC-7857 INFT standard

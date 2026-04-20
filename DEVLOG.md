@@ -8,3 +8,6 @@
 
 ### April 18
 - Set up monorepo: frontend, backend, contracts, skills
+
+### April 20
+- Drafted AgentRegistry.sol and NeuronForgeINFT.sol

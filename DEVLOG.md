@@ -16,3 +16,4 @@
 ### April 22
 - Implemented OpenClaw ReAct reasoning loop
 - Added tool registry with dynamic skill loading
+- Core agent creation and chat flow

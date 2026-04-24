@@ -17,3 +17,8 @@
 - Implemented OpenClaw ReAct reasoning loop
 - Added tool registry with dynamic skill loading
 - Core agent creation and chat flow
+
+## Week 2: 0G Integration (April 24-30)
+
+### April 24
+- Integrated 0G Compute SDK for TEE-verified inference

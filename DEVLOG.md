@@ -23,3 +23,6 @@
 ### April 24
 - Integrated 0G Compute SDK for TEE-verified inference
 - Connected DeepSeek V3 and Qwen 2.5 models
+
+### April 26
+- 0G Storage integration for agent memory persistence

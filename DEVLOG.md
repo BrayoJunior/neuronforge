@@ -26,3 +26,6 @@
 
 ### April 26
 - 0G Storage integration for agent memory persistence
+
+### April 27
+- 0G Chain service: balance, transfers, block info

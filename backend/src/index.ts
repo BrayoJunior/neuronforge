@@ -7,6 +7,11 @@ import { marketplaceRoutes } from './routes/marketplace.js';
 
 dotenv.config({ path: '../.env' });
 
+// Prevent unhandled rejections from crashing the server (0G SDK network errors)
+process.on('unhandledRejection', (reason, promise) => {
+  console.warn('⚠️ Unhandled rejection (non-fatal):', reason);
+});
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 

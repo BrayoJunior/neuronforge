@@ -58,19 +58,18 @@ export async function createAgent(config: AgentConfig): Promise<AgentInstance> {
   agents.set(id, agent);
   console.log(`⚡ Agent "${agent.name}" created [${id}] with skills: ${agent.skills.join(', ')}`);
 
-  // Persist initial state to 0G Storage
-  try {
-    const result = await uploadAgentState(id, {
-      persona: agent.persona,
-      skills: agent.skills,
-      config: { model: agent.model, providerAddress: agent.providerAddress },
-      version: 1,
-    });
+  // Persist initial state to 0G Storage (non-blocking)
+  uploadAgentState(id, {
+    persona: agent.persona,
+    skills: agent.skills,
+    config: { model: agent.model, providerAddress: agent.providerAddress },
+    version: 1,
+  }).then(result => {
     agent.stateHash = result.rootHash;
     console.log(`💾 Initial state persisted: ${result.rootHash}`);
-  } catch (e) {
+  }).catch(e => {
     console.warn('⚠️ State persistence skipped:', (e as Error).message);
-  }
+  });
 
   return agent;
 }

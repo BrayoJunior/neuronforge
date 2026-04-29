@@ -33,3 +33,4 @@
 
 ### April 29
 - Smart contracts finalized and deployed
+- AgentRegistry on-chain registration

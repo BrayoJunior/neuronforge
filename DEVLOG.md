@@ -30,3 +30,6 @@
 ### April 27
 - 0G Chain service: balance, transfers, block info
 - Built 6 agent tools
+
+### April 29
+- Smart contracts finalized and deployed

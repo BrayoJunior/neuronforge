@@ -382,14 +382,20 @@ function registerBuiltinTools(agent: AgentInstance) {
   if (agent.skills.includes('0g-wallet')) {
     agent.tools.set('check_balance', {
       name: 'check_balance',
-      description: 'Check the OG token balance of a wallet address on 0G Chain.',
-      parameters: { address: 'Wallet address to check (optional, defaults to agent wallet)' },
+      description: 'Check the OG token balance of a wallet on 0G Chain. If no address is given, checks the agent\'s own wallet.',
+      parameters: { address: '(Optional) A valid 0x... wallet address. Leave empty to check the agent wallet.' },
       execute: async (params: Record<string, unknown>) => {
         const { ethers } = await import('ethers');
         const provider = new ethers.JsonRpcProvider(process.env.OG_RPC_URL || 'https://evmrpc-testnet.0g.ai');
-        const address = (params.address as string) || (process.env.PRIVATE_KEY
-          ? new ethers.Wallet(process.env.PRIVATE_KEY).address
-          : '0x0000000000000000000000000000000000000000');
+        
+        // Validate address — fall back to agent wallet if invalid/placeholder
+        let address = (params.address as string) || '';
+        if (!address || !address.startsWith('0x') || address.length !== 42) {
+          address = process.env.PRIVATE_KEY
+            ? new ethers.Wallet(process.env.PRIVATE_KEY).address
+            : '0x0000000000000000000000000000000000000000';
+        }
+        
         const balance = await provider.getBalance(address);
         return {
           address,

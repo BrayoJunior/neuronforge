@@ -7,9 +7,7 @@
 
 import { ethers } from 'ethers';
 import { createZGComputeNetworkBroker } from '@0glabs/0g-serving-broker';
-import dotenv from 'dotenv';
 
-dotenv.config({ path: '../../.env' });
 
 const RPC_URL = process.env.OG_COMPUTE_RPC || 'https://evmrpc-testnet.0g.ai';
 

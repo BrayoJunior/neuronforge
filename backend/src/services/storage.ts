@@ -10,9 +10,7 @@
 
 import { Indexer, ZgFile, MemData } from '@0gfoundation/0g-ts-sdk';
 import { ethers } from 'ethers';
-import dotenv from 'dotenv';
 
-dotenv.config({ path: '../../.env' });
 
 const RPC_URL = process.env.OG_RPC_URL || 'https://evmrpc-testnet.0g.ai';
 const INDEXER_RPC = process.env.OG_STORAGE_INDEXER_RPC || 'https://indexer-storage-testnet-turbo.0g.ai';

@@ -9,22 +9,22 @@
  */
 
 import { ethers } from 'ethers';
-import dotenv from 'dotenv';
 
-dotenv.config({ path: '../../.env' });
 
 const RPC_URL = process.env.OG_RPC_URL || 'https://evmrpc-testnet.0g.ai';
 
 let provider: ethers.JsonRpcProvider | null = null;
 let signer: ethers.Wallet | null = null;
 
-// Contract addresses (populated after deployment)
-const CONTRACT_ADDRESSES = {
-  agentRegistry: process.env.AGENT_REGISTRY_ADDRESS || '',
-  skillRegistry: process.env.SKILL_REGISTRY_ADDRESS || '',
-  neuronForgeINFT: process.env.INFT_ADDRESS || '',
-  marketplace: process.env.MARKETPLACE_ADDRESS || '',
-};
+// Contract addresses — read lazily so dotenv has time to load
+function getContractAddresses() {
+  return {
+    agentRegistry: process.env.AGENT_REGISTRY_ADDRESS || '',
+    skillRegistry: process.env.SKILL_REGISTRY_ADDRESS || '',
+    neuronForgeINFT: process.env.INFT_ADDRESS || '',
+    marketplace: process.env.MARKETPLACE_ADDRESS || '',
+  };
+}
 
 /**
  * Initialize the 0G Chain service
@@ -101,11 +101,11 @@ export async function registerAgent(
   skillHashes: string[],
   name: string
 ): Promise<{ tokenId: string; txHash: string }> {
-  if (!CONTRACT_ADDRESSES.agentRegistry) {
+  if (!getContractAddresses().agentRegistry) {
     throw new Error('AgentRegistry contract not deployed');
   }
 
-  const contract = getContract(CONTRACT_ADDRESSES.agentRegistry, [
+  const contract = getContract(getContractAddresses().agentRegistry, [
     'function registerAgent(string metadataHash, string[] skillHashes, string name) returns (uint256)',
     'event AgentRegistered(uint256 indexed tokenId, address indexed creator, string name)',
   ]);
@@ -129,11 +129,11 @@ export async function mintINFT(
   metadataURI: string,
   encryptedIntelligence: string
 ): Promise<{ tokenId: string; txHash: string }> {
-  if (!CONTRACT_ADDRESSES.neuronForgeINFT) {
+  if (!getContractAddresses().neuronForgeINFT) {
     throw new Error('NeuronForgeINFT contract not deployed');
   }
 
-  const contract = getContract(CONTRACT_ADDRESSES.neuronForgeINFT, [
+  const contract = getContract(getContractAddresses().neuronForgeINFT, [
     'function mintAgent(address to, string metadataURI, bytes encryptedIntelligence) returns (uint256)',
     'event AgentMinted(uint256 indexed tokenId, address indexed to, string metadataURI)',
   ]);
@@ -160,11 +160,11 @@ export async function listOnMarketplace(
   tokenId: string,
   priceInOG: string
 ): Promise<{ txHash: string }> {
-  if (!CONTRACT_ADDRESSES.marketplace) {
+  if (!getContractAddresses().marketplace) {
     throw new Error('Marketplace contract not deployed');
   }
 
-  const contract = getContract(CONTRACT_ADDRESSES.marketplace, [
+  const contract = getContract(getContractAddresses().marketplace, [
     'function listAgent(uint256 tokenId, uint256 price)',
   ]);
 
@@ -175,4 +175,4 @@ export async function listOnMarketplace(
   return { txHash: tx.hash };
 }
 
-export { CONTRACT_ADDRESSES };
+export { getContractAddresses as CONTRACT_ADDRESSES };

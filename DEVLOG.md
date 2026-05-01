@@ -35,3 +35,8 @@
 - Smart contracts finalized and deployed
 - AgentRegistry on-chain registration
 - Deployed to 0G Testnet and Mainnet
+
+## Week 3: Skills & Frontend (May 1-7)
+
+### May 1
+- Created 4 OpenClaw skills

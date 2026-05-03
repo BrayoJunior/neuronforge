@@ -40,3 +40,6 @@
 
 ### May 1
 - Created 4 OpenClaw skills
+
+### May 3
+- CSS design system, landing page with particle bg

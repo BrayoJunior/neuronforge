@@ -43,3 +43,4 @@
 
 ### May 3
 - CSS design system, landing page with particle bg
+- Navbar with MetaMask wallet connect

@@ -47,3 +47,4 @@
 
 ### May 5
 - Forge page with agent builder and chat UI
+- ReAct visualization in chat

@@ -52,3 +52,4 @@
 
 ### May 7
 - Skills Explorer and Marketplace pages
+- Complete backend API routes

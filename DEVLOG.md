@@ -49,3 +49,6 @@
 - Forge page with agent builder and chat UI
 - ReAct visualization in chat
 - Rich tool output renderers
+
+### May 7
+- Skills Explorer and Marketplace pages

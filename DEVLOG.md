@@ -53,3 +53,8 @@
 ### May 7
 - Skills Explorer and Marketplace pages
 - Complete backend API routes
+
+## Week 4: Polish & Submission (May 8-15)
+
+### May 8
+- Dynamic network detection

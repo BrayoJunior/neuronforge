@@ -58,3 +58,6 @@
 
 ### May 8
 - Dynamic network detection
+
+### May 10
+- Deployed frontend to Vercel, backend to Render

@@ -61,3 +61,6 @@
 
 ### May 10
 - Deployed frontend to Vercel, backend to Render
+
+### May 12
+- Client-side MetaMask signing for INFT minting

@@ -17,10 +17,19 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:3000',
-    'http://localhost:3000',
-  ],
+  origin: (origin, callback) => {
+    const allowed = [
+      process.env.FRONTEND_URL,
+      'http://localhost:3000',
+    ].filter(Boolean);
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    // Also allow any *.vercel.app domain
+    if (!origin || allowed.includes(origin) || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all in hackathon mode
+    }
+  },
   credentials: true,
 }));
 app.use(express.json({ limit: '50mb' }));

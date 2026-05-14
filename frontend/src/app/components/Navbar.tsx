@@ -110,7 +110,7 @@ export default function Navbar() {
       setChainOk(true);
       if (address) fetchBalance(address);
     } catch (e: any) {
-      if (e.code === 4902 || e.code === 4001) {
+      if (e.code === 4902) {
         try {
           // Only pass fields MetaMask expects (strip 'network')
           await eth.request({
@@ -147,12 +147,7 @@ export default function Navbar() {
       if (accounts.length > 0) {
         setAddress(accounts[0]);
         fetchBalance(accounts[0]);
-
-        const chainId = await eth.request({ method: "eth_chainId" });
-        if (chainId !== targetChain.chainId) {
-          await switchToOG();
-        }
-        setChainOk(true);
+        checkChain();
       }
     } catch (e) {
       console.error("Wallet connection failed:", e);

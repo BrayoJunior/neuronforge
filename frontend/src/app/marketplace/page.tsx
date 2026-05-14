@@ -93,10 +93,36 @@ const DEMO_LISTINGS: Listing[] = [
 ];
 
 export default function MarketplacePage() {
-  const [listings] = useState<Listing[]>(DEMO_LISTINGS);
+  const [listings, setListings] = useState<Listing[]>(DEMO_LISTINGS);
   const [sortBy, setSortBy] = useState<"price" | "rating" | "sales">("rating");
   const [mintingId, setMintingId] = useState<string | null>(null);
   const [mintResult, setMintResult] = useState<Record<string, { tokenId: string; txHash: string } | null>>({});
+  const [showListForm, setShowListForm] = useState(false);
+  const [listName, setListName] = useState("");
+  const [listDesc, setListDesc] = useState("");
+  const [listSkills, setListSkills] = useState<string[]>(["0g-inference", "0g-memory"]);
+
+  const SKILL_OPTIONS = ["0g-inference", "0g-memory", "0g-wallet", "0g-publish"];
+
+  const handleListAgent = () => {
+    if (!listName.trim() || !listDesc.trim()) return;
+    const newListing: Listing = {
+      id: `custom-${Date.now()}`,
+      name: listName,
+      description: listDesc,
+      price: "Free",
+      skills: listSkills,
+      creator: "You",
+      rating: 5.0,
+      sales: 0,
+      persona: listDesc,
+    };
+    setListings(prev => [newListing, ...prev]);
+    setShowListForm(false);
+    setListName("");
+    setListDesc("");
+    setListSkills(["0g-inference", "0g-memory"]);
+  };
 
   const sorted = [...listings].sort((a, b) => {
     if (sortBy === "price") return 0;
@@ -170,10 +196,73 @@ export default function MarketplacePage() {
             Mint agent INFTs directly to your wallet via MetaMask
           </p>
         </div>
-        <a href="/forge" className="btn btn-primary">
-          ⚡ Create Custom Agent
-        </a>
+        <div className="flex gap-sm">
+          <button
+            className="btn btn-secondary"
+            onClick={() => setShowListForm(!showListForm)}
+          >
+            {showListForm ? "✕ Close" : "📋 List Agent"}
+          </button>
+          <a href="/forge" className="btn btn-primary">
+            ⚡ Create Custom
+          </a>
+        </div>
       </div>
+
+      {/* List Agent Form */}
+      {showListForm && (
+        <div className="card" style={{ marginBottom: "2rem", padding: "1.5rem" }}>
+          <h3 style={{ marginBottom: "1rem" }}>📋 List Your Agent on the Marketplace</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <div className="input-group">
+              <label className="input-label">Agent Name *</label>
+              <input
+                className="input"
+                placeholder="e.g., MEV Detector, NFT Sniper"
+                value={listName}
+                onChange={(e) => setListName(e.target.value)}
+              />
+            </div>
+            <div className="input-group">
+              <label className="input-label">Skills</label>
+              <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", paddingTop: "0.5rem" }}>
+                {SKILL_OPTIONS.map(s => (
+                  <button
+                    key={s}
+                    className={`btn btn-sm ${listSkills.includes(s) ? "btn-primary" : "btn-ghost"}`}
+                    onClick={() => setListSkills(prev =>
+                      prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]
+                    )}
+                    style={{ fontSize: "0.7rem", padding: "4px 8px" }}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="input-group" style={{ marginTop: "1rem" }}>
+            <label className="input-label">Description *</label>
+            <textarea
+              className="input"
+              placeholder="Describe what your agent does, its capabilities, and specialization..."
+              value={listDesc}
+              onChange={(e) => setListDesc(e.target.value)}
+              rows={2}
+            />
+          </div>
+          <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end" }}>
+            <button
+              className="btn btn-primary"
+              onClick={handleListAgent}
+              disabled={!listName.trim() || !listDesc.trim()}
+              style={{ opacity: (!listName.trim() || !listDesc.trim()) ? 0.5 : 1 }}
+            >
+              🚀 List on Marketplace
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Sort Controls */}
       <div className="flex gap-sm" style={{ marginBottom: "1.5rem", alignItems: "center" }}>

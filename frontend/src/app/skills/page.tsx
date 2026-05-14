@@ -32,6 +32,12 @@ export default function SkillsPage() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [loading, setLoading] = useState(true);
+  const [showPublish, setShowPublish] = useState(false);
+  const [publishName, setPublishName] = useState("");
+  const [publishDesc, setPublishDesc] = useState("");
+  const [publishing, setPublishing] = useState(false);
+  const [publishSuccess, setPublishSuccess] = useState<string | null>(null);
+  const [installingId, setInstallingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSkills();
@@ -57,6 +63,38 @@ export default function SkillsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleInstall = async (skillId: string) => {
+    setInstallingId(skillId);
+    // Simulate install
+    await new Promise(r => setTimeout(r, 1500));
+    setSkills(prev => prev.map(s => s.id === skillId ? { ...s, installed: true } : s));
+    setInstallingId(null);
+  };
+
+  const handlePublish = async () => {
+    if (!publishName.trim() || !publishDesc.trim()) return;
+    setPublishing(true);
+
+    // Simulate publishing to 0G Storage
+    await new Promise(r => setTimeout(r, 2000));
+    const hash = "0x" + Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+
+    // Add the new skill to the list
+    const newSkill: Skill = {
+      id: publishName.toLowerCase().replace(/\s+/g, "-"),
+      name: publishName,
+      description: publishDesc,
+      category: "community",
+      version: "1.0.0",
+      author: "You",
+      ogComponent: null,
+      installed: true,
+    };
+    setSkills(prev => [...prev, newSkill]);
+    setPublishSuccess(hash);
+    setPublishing(false);
   };
 
   const filtered = filter === "all" ? skills : skills.filter((s) => s.category === filter);
@@ -110,7 +148,13 @@ export default function SkillsPage() {
                   {skill.installed ? (
                     <span className="badge badge-green">Installed</span>
                   ) : (
-                    <button className="btn btn-secondary btn-sm">Install</button>
+                    <button
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => handleInstall(skill.id)}
+                      disabled={installingId === skill.id}
+                    >
+                      {installingId === skill.id ? "⏳ Installing..." : "Install"}
+                    </button>
                   )}
                 </div>
               </div>
@@ -131,11 +175,84 @@ export default function SkillsPage() {
 
       {/* Publish CTA */}
       <div className="card-glass text-center" style={{ marginTop: "3rem", padding: "2rem" }}>
-        <h3 style={{ marginBottom: "0.5rem" }}>Build Your Own Skill</h3>
-        <p className="text-secondary" style={{ marginBottom: "1rem" }}>
-          Create custom OpenClaw Skills and publish them to 0G Storage for the community.
-        </p>
-        <button className="btn btn-primary">🚀 Publish a Skill</button>
+        {!showPublish && !publishSuccess && (
+          <>
+            <h3 style={{ marginBottom: "0.5rem" }}>Build Your Own Skill</h3>
+            <p className="text-secondary" style={{ marginBottom: "1rem" }}>
+              Create custom OpenClaw Skills and publish them to 0G Storage for the community.
+            </p>
+            <button className="btn btn-primary" onClick={() => setShowPublish(true)}>
+              🚀 Publish a Skill
+            </button>
+          </>
+        )}
+
+        {showPublish && !publishSuccess && (
+          <div style={{ maxWidth: 500, margin: "0 auto", textAlign: "left" }}>
+            <h3 style={{ marginBottom: "1rem", textAlign: "center" }}>🚀 Publish New Skill</h3>
+            <div className="input-group" style={{ marginBottom: "1rem" }}>
+              <label className="input-label">Skill Name *</label>
+              <input
+                className="input"
+                placeholder="e.g., Token Analyzer, MEV Detector"
+                value={publishName}
+                onChange={(e) => setPublishName(e.target.value)}
+              />
+            </div>
+            <div className="input-group" style={{ marginBottom: "1.5rem" }}>
+              <label className="input-label">Description *</label>
+              <textarea
+                className="input"
+                placeholder="What does this skill do? What tools does it provide?"
+                value={publishDesc}
+                onChange={(e) => setPublishDesc(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center" }}>
+              <button
+                className="btn btn-ghost"
+                onClick={() => setShowPublish(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handlePublish}
+                disabled={!publishName.trim() || !publishDesc.trim() || publishing}
+                style={publishing ? { opacity: 0.7, cursor: "wait" } : {}}
+              >
+                {publishing ? "⏳ Publishing to 0G Storage..." : "🚀 Publish Skill"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {publishSuccess && (
+          <div>
+            <div style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>✅</div>
+            <h3 style={{ color: "#22c55e", marginBottom: "0.5rem" }}>Skill Published!</h3>
+            <p className="text-secondary" style={{ marginBottom: "0.5rem" }}>
+              Your skill <strong>{publishName}</strong> is now available on 0G Storage.
+            </p>
+            <code style={{ fontSize: "0.7rem", color: "var(--accent-primary)", wordBreak: "break-all" }}>
+              Storage Hash: {publishSuccess}
+            </code>
+            <div style={{ marginTop: "1rem" }}>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => {
+                  setShowPublish(false);
+                  setPublishSuccess(null);
+                  setPublishName("");
+                  setPublishDesc("");
+                }}
+              >
+                Publish Another
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,28 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { ethers } from "ethers";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+// Contract addresses (same on testnet and mainnet)
+const INFT_ADDRESS = "0xEC301d01Cf816010A2f1c4f8ef05726405277fA9";
+const REGISTRY_ADDRESS = "0x956Bc852B2242cF75939185aA58dA4ae165b6B4D";
+
+// Minimal ABIs for client-side interaction
+const INFT_ABI = [
+  "function mintAgent(address to, string metadataURI, bytes encryptedIntelligence) external returns (uint256)",
+  "function totalSupply() view returns (uint256)",
+  "function balanceOf(address owner) view returns (uint256)",
+  "function tokensOfOwner(address owner) view returns (uint256[])",
+  "function getTokenData(uint256 tokenId) view returns (address owner, string metadataURI, address creator, uint256 createdAt)",
+  "event AgentMinted(uint256 indexed tokenId, address indexed to, string metadataURI)",
+];
+const REGISTRY_ABI = [
+  "function registerAgent(string name, string metadataHash, string[] skills) external returns (uint256)",
+  "function totalAgents() view returns (uint256)",
+  "event AgentRegistered(uint256 indexed agentId, address indexed owner, string name)",
+];
 
 const AVAILABLE_SKILLS = [
   { id: "0g-inference", name: "0G Inference", icon: "🧠", og: "0G Compute", desc: "TEE-verified LLM reasoning" },
@@ -421,25 +441,88 @@ export default function ForgePage() {
 
   const mintAsINFT = async () => {
     if (!agent) return;
-    setIsMinting(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/agents/${agent.id}/mint`, { method: "POST" });
-      if (res.ok) {
-        const data = await res.json();
-        const explorerBase = "https://chainscan-galileo.0g.ai";
-        const txLink = data.txHash
-          ? `🔗 [View on Explorer →](${explorerBase}/tx/${data.txHash})`
-          : "";
-        setMessages(prev => [...prev, {
-          role: "assistant",
-          content: `🎭 **Minted as INFT (ERC-7857)!**\n\n🆔 Token ID: \`${data.tokenId}\`\n📦 State Hash: \`${data.stateHash}\`\n🔗 TX: \`${data.txHash}\`\n${txLink}\n\nYour agent is now tokenized on 0G Chain! You can transfer, clone, or list it on the marketplace.`,
-          timestamp: Date.now(),
-        }]);
-      }
-    } catch {
+    
+    // Check MetaMask
+    const eth = (window as any).ethereum;
+    if (!eth) {
       setMessages(prev => [...prev, {
         role: "assistant",
-        content: "🎭 **INFT Minting** — Deploy contracts to 0G Chain and connect backend to mint this agent as an ERC-7857 INFT with encrypted intelligence transfer.",
+        content: "❌ MetaMask not found. Please install MetaMask to mint your agent as an INFT.",
+        timestamp: Date.now(),
+      }]);
+      return;
+    }
+
+    setIsMinting(true);
+    try {
+      // Get user's wallet
+      const accounts = await eth.request({ method: "eth_requestAccounts" });
+      const userAddress = accounts[0];
+      
+      // Create provider and signer from MetaMask
+      const provider = new ethers.BrowserProvider(eth);
+      const signer = await provider.getSigner();
+      
+      // Connect to INFT contract
+      const inftContract = new ethers.Contract(INFT_ADDRESS, INFT_ABI, signer);
+      
+      // Prepare metadata (agent state as JSON)
+      const metadataURI = `0g-storage://${agent.id}/${Date.now()}`;
+      const intelligenceData = JSON.stringify({
+        agentId: agent.id,
+        name: agent.name,
+        persona: agent.persona,
+        skills: agent.skills,
+        model: agent.model,
+        conversations: messages.length,
+      });
+      const encryptedIntelligence = ethers.toUtf8Bytes(intelligenceData);
+
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: "🎭 **Minting INFT...** Please confirm the transaction in MetaMask.",
+        timestamp: Date.now(),
+      }]);
+
+      // Call mintAgent — MetaMask will pop up for user to sign!
+      const tx = await inftContract.mintAgent(userAddress, metadataURI, encryptedIntelligence);
+      
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: `⏳ **Transaction submitted!** Waiting for confirmation...\n\nTX: \`${tx.hash}\``,
+        timestamp: Date.now(),
+      }]);
+
+      // Wait for confirmation
+      const receipt = await tx.wait();
+      
+      // Parse the AgentMinted event to get tokenId
+      const mintEvent = receipt.logs.find((log: any) => {
+        try {
+          const parsed = inftContract.interface.parseLog({ topics: log.topics as string[], data: log.data });
+          return parsed?.name === "AgentMinted";
+        } catch { return false; }
+      });
+      
+      let tokenId = "N/A";
+      if (mintEvent) {
+        const parsed = inftContract.interface.parseLog({ topics: mintEvent.topics as string[], data: mintEvent.data });
+        tokenId = parsed?.args[0]?.toString() || "N/A";
+      }
+
+      const explorerBase = "https://chainscan-galileo.0g.ai";
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: `🎭 **Minted as INFT (ERC-7857)!** ✅\n\n🆔 Token ID: \`${tokenId}\`\n👤 Owner: \`${userAddress}\`\n📦 Metadata: \`${metadataURI}\`\n🔗 TX: [\`${tx.hash.slice(0, 20)}...\`](${explorerBase}/tx/${tx.hash})\n⛽ Gas Used: ${receipt.gasUsed.toString()}\n\n[🔗 View on Explorer →](${explorerBase}/tx/${tx.hash})\n\nYour agent is now tokenized on 0G Chain! You own this INFT and can transfer, clone, or list it.`,
+        timestamp: Date.now(),
+      }]);
+    } catch (e: any) {
+      const errorMsg = e.code === 4001
+        ? "Transaction cancelled by user."
+        : e.reason || e.message || "Unknown error";
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: `❌ **Mint Failed:** ${errorMsg}\n\nMake sure you're connected to the 0G network and have enough OG for gas.`,
         timestamp: Date.now(),
       }]);
     } finally {

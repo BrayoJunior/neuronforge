@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-// Fallback chain config (testnet) — used if backend is unreachable
 const FALLBACK_CHAIN = {
   chainId: "0x40DA",
   chainName: "0G-Galileo-Testnet",
@@ -23,6 +22,18 @@ interface ChainConfig {
   network: string;
 }
 
+// Find MetaMask provider specifically, handles multiple wallet extensions
+function getProvider(): any {
+  if (typeof window === "undefined") return null;
+  const eth = (window as any).ethereum;
+  if (!eth) return null;
+  // If multiple providers, find MetaMask
+  if (eth.providers?.length) {
+    return eth.providers.find((p: any) => p.isMetaMask) || eth.providers[0];
+  }
+  return eth;
+}
+
 export default function Navbar() {
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
@@ -32,7 +43,6 @@ export default function Navbar() {
   const [pathname, setPathname] = useState("/");
   const [targetChain, setTargetChain] = useState<ChainConfig>(FALLBACK_CHAIN);
 
-  // Fetch network config from backend on mount
   useEffect(() => {
     setPathname(window.location.pathname);
     fetchNetworkConfig();
@@ -51,69 +61,86 @@ export default function Navbar() {
     }
   };
 
-  // Check if already connected on mount
+  // Auto-detect existing connection on mount
   useEffect(() => {
-    const eth = (window as any).ethereum;
-    if (!eth) return;
+    const provider = getProvider();
+    if (!provider) return;
 
-    eth.request({ method: "eth_accounts" }).then((accounts: string[]) => {
-      if (accounts.length > 0) {
-        setAddress(accounts[0]);
-        fetchBalance(accounts[0]);
-        checkChain();
+    const init = async () => {
+      try {
+        const accounts = await provider.request({ method: "eth_accounts" });
+        if (accounts.length > 0) {
+          setAddress(accounts[0]);
+          fetchBalanceSafe(accounts[0], provider);
+          checkChainSafe(provider);
+        }
+      } catch (e) {
+        console.log("Auto-connect skipped:", e);
       }
-    });
+    };
+    init();
 
-    eth.on("accountsChanged", (accounts: string[]) => {
-      if (accounts.length === 0) {
-        setAddress(null);
-        setBalance(null);
-      } else {
-        setAddress(accounts[0]);
-        fetchBalance(accounts[0]);
-      }
-    });
-    eth.on("chainChanged", () => {
-      checkChain();
-      if (address) fetchBalance(address);
-    });
+    try {
+      provider.on("accountsChanged", (accounts: string[]) => {
+        if (accounts.length === 0) {
+          setAddress(null);
+          setBalance(null);
+        } else {
+          setAddress(accounts[0]);
+          fetchBalanceSafe(accounts[0], provider);
+        }
+      });
+      provider.on("chainChanged", () => {
+        const addr = address;
+        checkChainSafe(provider);
+        if (addr) fetchBalanceSafe(addr, provider);
+      });
+    } catch (e) {
+      console.log("Event listeners skipped:", e);
+    }
   }, [targetChain]);
 
-  const checkChain = async () => {
-    const eth = (window as any).ethereum;
-    if (!eth) return;
-    const chainId = await eth.request({ method: "eth_chainId" });
-    setChainOk(chainId === targetChain.chainId);
+  const checkChainSafe = async (provider?: any) => {
+    try {
+      const eth = provider || getProvider();
+      if (!eth) return;
+      const chainId = await eth.request({ method: "eth_chainId" });
+      setChainOk(chainId === targetChain.chainId);
+    } catch (e) {
+      console.log("Chain check failed:", e);
+    }
   };
 
-  const fetchBalance = async (addr: string) => {
+  const fetchBalanceSafe = async (addr: string, provider?: any) => {
     try {
-      const eth = (window as any).ethereum;
+      const eth = provider || getProvider();
+      if (!eth) return;
       const bal = await eth.request({
         method: "eth_getBalance",
         params: [addr, "latest"],
       });
       const ogBal = parseInt(bal, 16) / 1e18;
       setBalance(ogBal.toFixed(3));
-    } catch {
+    } catch (e) {
+      console.log("Balance fetch failed:", e);
       setBalance(null);
     }
   };
 
   const switchToOG = async () => {
-    const eth = (window as any).ethereum;
+    const provider = getProvider();
+    if (!provider) return;
     try {
-      await eth.request({
+      await provider.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: targetChain.chainId }],
       });
       setChainOk(true);
-      if (address) fetchBalance(address);
+      if (address) fetchBalanceSafe(address, provider);
     } catch (e: any) {
       if (e.code === 4902) {
         try {
-          // Only pass fields MetaMask expects (strip 'network')
-          await eth.request({
+          await provider.request({
             method: "wallet_addEthereumChain",
             params: [{
               chainId: targetChain.chainId,
@@ -124,30 +151,28 @@ export default function Navbar() {
             }],
           });
           setChainOk(true);
-          if (address) fetchBalance(address);
+          if (address) fetchBalanceSafe(address, provider);
         } catch (addError) {
           console.error("Failed to add network:", addError);
         }
-      } else {
-        console.error("Failed to switch network:", e);
       }
     }
   };
 
   const connect = useCallback(async () => {
-    const eth = (window as any).ethereum;
-    if (!eth) {
+    const provider = getProvider();
+    if (!provider) {
       window.open("https://metamask.io/download/", "_blank");
       return;
     }
 
     setConnecting(true);
     try {
-      const accounts = await eth.request({ method: "eth_requestAccounts" });
+      const accounts = await provider.request({ method: "eth_requestAccounts" });
       if (accounts.length > 0) {
         setAddress(accounts[0]);
-        fetchBalance(accounts[0]);
-        checkChain();
+        fetchBalanceSafe(accounts[0], provider);
+        checkChainSafe(provider);
       }
     } catch (e) {
       console.error("Wallet connection failed:", e);

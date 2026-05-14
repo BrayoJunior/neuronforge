@@ -398,9 +398,13 @@ export default function ForgePage() {
       const res = await fetch(`${API_BASE}/api/agents/${agent.id}/persist`, { method: "POST" });
       if (res.ok) {
         const data = await res.json();
+        const explorerBase = "https://chainscan-galileo.0g.ai";
+        const txLine = data.txHash && data.txHash !== 'undefined'
+          ? `🔗 TX: [\`${data.txHash.slice(0, 16)}...\`](${explorerBase}/tx/${data.txHash})`
+          : "📡 Stored via 0G Storage SDK (off-chain indexer)";
         setMessages(prev => [...prev, {
           role: "assistant",
-          content: `💾 **Memory persisted to 0G Storage!**\n\n📦 Root Hash: \`${data.memoryHash}\`\n📝 TX: \`${data.txHash}\`\n💬 ${data.conversationsCount} messages saved\n\nYour memory is now permanently stored on 0G's decentralized storage network.`,
+          content: `💾 **Memory persisted to 0G Storage!**\n\n📦 Root Hash: \`${data.memoryHash}\`\n${txLine}\n💬 ${data.conversationsCount} messages saved\n\nYour memory is now permanently stored on 0G's decentralized storage network.`,
           timestamp: Date.now(),
         }]);
       }
@@ -422,9 +426,13 @@ export default function ForgePage() {
       const res = await fetch(`${API_BASE}/api/agents/${agent.id}/mint`, { method: "POST" });
       if (res.ok) {
         const data = await res.json();
+        const explorerBase = "https://chainscan-galileo.0g.ai";
+        const txLink = data.txHash
+          ? `🔗 [View on Explorer →](${explorerBase}/tx/${data.txHash})`
+          : "";
         setMessages(prev => [...prev, {
           role: "assistant",
-          content: `🎭 **Minted as INFT (ERC-7857)!**\n\n🆔 Token ID: \`${data.tokenId}\`\n📦 State Hash: \`${data.stateHash}\`\n🔗 TX: \`${data.txHash}\`\n\nYour agent is now tokenized on 0G Chain! You can transfer, clone, or list it on the marketplace.`,
+          content: `🎭 **Minted as INFT (ERC-7857)!**\n\n🆔 Token ID: \`${data.tokenId}\`\n📦 State Hash: \`${data.stateHash}\`\n🔗 TX: \`${data.txHash}\`\n${txLink}\n\nYour agent is now tokenized on 0G Chain! You can transfer, clone, or list it on the marketplace.`,
           timestamp: Date.now(),
         }]);
       }
@@ -598,15 +606,17 @@ export default function ForgePage() {
             className="btn btn-secondary btn-sm"
             onClick={persistMemory}
             disabled={isPersisting}
+            style={isPersisting ? { opacity: 0.7, cursor: "wait" } : {}}
           >
-            {isPersisting ? "⏳" : "💾"} Persist Memory
+            {isPersisting ? "⏳ Persisting..." : "💾 Persist Memory"}
           </button>
           <button
             className="btn btn-primary btn-sm"
             onClick={mintAsINFT}
             disabled={isMinting}
+            style={isMinting ? { opacity: 0.7, cursor: "wait" } : {}}
           >
-            {isMinting ? "⏳" : "🎭"} Mint INFT
+            {isMinting ? "⏳ Minting..." : "🎭 Mint INFT"}
           </button>
         </div>
       </div>

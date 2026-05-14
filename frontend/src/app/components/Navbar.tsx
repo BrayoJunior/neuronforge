@@ -105,7 +105,7 @@ export default function Navbar() {
       const eth = provider || getProvider();
       if (!eth) return;
       const chainId = await eth.request({ method: "eth_chainId" });
-      setChainOk(chainId === targetChain.chainId);
+      setChainOk(chainId.toLowerCase() === targetChain.chainId.toLowerCase());
     } catch (e) {
       console.log("Chain check failed:", e);
     }

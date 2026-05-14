@@ -313,35 +313,81 @@ export default function HomePage() {
             <h2 style={{ marginBottom: "0.75rem" }}>
               Verified <span className="text-gradient">On-Chain</span> Contracts
             </h2>
-            <p className="text-secondary">Deployed and active on 0G Galileo Testnet</p>
+            <p className="text-secondary">Deployed on both 0G Mainnet and Galileo Testnet</p>
           </div>
-          <div className="grid grid-2" style={{ maxWidth: 800, margin: "0 auto" }}>
-            <div className="card" style={{ padding: "1.5rem" }}>
-              <div className="flex gap-sm" style={{ alignItems: "center", marginBottom: "0.75rem" }}>
-                <span className="live-dot" />
-                <h4 style={{ margin: 0 }}>AgentRegistry</h4>
+
+          {/* Mainnet */}
+          <div style={{ marginBottom: "2rem" }}>
+            <h3 style={{ fontSize: "1rem", color: "#22c55e", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
+              0G Mainnet
+            </h3>
+            <div className="grid grid-2" style={{ maxWidth: 800, margin: "0 auto" }}>
+              <div className="card" style={{ padding: "1.25rem", borderColor: "rgba(34,197,94,0.2)" }}>
+                <div className="flex gap-sm" style={{ alignItems: "center", marginBottom: "0.5rem" }}>
+                  <span className="live-dot" style={{ background: "#22c55e" }} />
+                  <h4 style={{ margin: 0, fontSize: "0.95rem" }}>AgentRegistry</h4>
+                </div>
+                <code className="text-mono" style={{ fontSize: "0.65rem", color: "#22c55e", wordBreak: "break-all" }}>
+                  0x956Bc852B2242cF75939185aA58dA4ae165b6B4D
+                </code>
+                <div style={{ marginTop: "0.5rem" }}>
+                  <a href="https://chainscan.0g.ai/address/0x956Bc852B2242cF75939185aA58dA4ae165b6B4D" target="_blank" rel="noopener" className="btn btn-secondary btn-sm" style={{ fontSize: "0.7rem" }}>
+                    🔗 Mainnet Explorer
+                  </a>
+                </div>
               </div>
-              <code className="text-mono" style={{ fontSize: "0.7rem", color: "var(--accent-primary)", wordBreak: "break-all" }}>
-                0x956Bc852B2242cF75939185aA58dA4ae165b6B4D
-              </code>
-              <div style={{ marginTop: "0.75rem" }}>
-                <a href="https://chainscan-galileo.0g.ai/address/0x956Bc852B2242cF75939185aA58dA4ae165b6B4D" target="_blank" rel="noopener" className="btn btn-secondary btn-sm">
-                  🔗 View on Explorer
-                </a>
+              <div className="card" style={{ padding: "1.25rem", borderColor: "rgba(34,197,94,0.2)" }}>
+                <div className="flex gap-sm" style={{ alignItems: "center", marginBottom: "0.5rem" }}>
+                  <span className="live-dot" style={{ background: "#22c55e" }} />
+                  <h4 style={{ margin: 0, fontSize: "0.95rem" }}>NeuronForgeINFT</h4>
+                </div>
+                <code className="text-mono" style={{ fontSize: "0.65rem", color: "#22c55e", wordBreak: "break-all" }}>
+                  0xEC301d01Cf816010A2f1c4f8ef05726405277fA9
+                </code>
+                <div style={{ marginTop: "0.5rem" }}>
+                  <a href="https://chainscan.0g.ai/address/0xEC301d01Cf816010A2f1c4f8ef05726405277fA9" target="_blank" rel="noopener" className="btn btn-secondary btn-sm" style={{ fontSize: "0.7rem" }}>
+                    🔗 Mainnet Explorer
+                  </a>
+                </div>
               </div>
             </div>
-            <div className="card" style={{ padding: "1.5rem" }}>
-              <div className="flex gap-sm" style={{ alignItems: "center", marginBottom: "0.75rem" }}>
-                <span className="live-dot" />
-                <h4 style={{ margin: 0 }}>NeuronForgeINFT</h4>
+          </div>
+
+          {/* Testnet */}
+          <div>
+            <h3 style={{ fontSize: "1rem", color: "#06b6d4", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#06b6d4", display: "inline-block" }} />
+              0G Galileo Testnet
+            </h3>
+            <div className="grid grid-2" style={{ maxWidth: 800, margin: "0 auto" }}>
+              <div className="card" style={{ padding: "1.25rem" }}>
+                <div className="flex gap-sm" style={{ alignItems: "center", marginBottom: "0.5rem" }}>
+                  <span className="live-dot" />
+                  <h4 style={{ margin: 0, fontSize: "0.95rem" }}>AgentRegistry</h4>
+                </div>
+                <code className="text-mono" style={{ fontSize: "0.65rem", color: "var(--accent-primary)", wordBreak: "break-all" }}>
+                  0x956Bc852B2242cF75939185aA58dA4ae165b6B4D
+                </code>
+                <div style={{ marginTop: "0.5rem" }}>
+                  <a href="https://chainscan-galileo.0g.ai/address/0x956Bc852B2242cF75939185aA58dA4ae165b6B4D" target="_blank" rel="noopener" className="btn btn-secondary btn-sm" style={{ fontSize: "0.7rem" }}>
+                    🔗 Testnet Explorer
+                  </a>
+                </div>
               </div>
-              <code className="text-mono" style={{ fontSize: "0.7rem", color: "var(--accent-primary)", wordBreak: "break-all" }}>
-                0xEC301d01Cf816010A2f1c4f8ef05726405277fA9
-              </code>
-              <div style={{ marginTop: "0.75rem" }}>
-                <a href="https://chainscan-galileo.0g.ai/address/0xEC301d01Cf816010A2f1c4f8ef05726405277fA9" target="_blank" rel="noopener" className="btn btn-secondary btn-sm">
-                  🔗 View on Explorer
-                </a>
+              <div className="card" style={{ padding: "1.25rem" }}>
+                <div className="flex gap-sm" style={{ alignItems: "center", marginBottom: "0.5rem" }}>
+                  <span className="live-dot" />
+                  <h4 style={{ margin: 0, fontSize: "0.95rem" }}>NeuronForgeINFT</h4>
+                </div>
+                <code className="text-mono" style={{ fontSize: "0.65rem", color: "var(--accent-primary)", wordBreak: "break-all" }}>
+                  0xEC301d01Cf816010A2f1c4f8ef05726405277fA9
+                </code>
+                <div style={{ marginTop: "0.5rem" }}>
+                  <a href="https://chainscan-galileo.0g.ai/address/0xEC301d01Cf816010A2f1c4f8ef05726405277fA9" target="_blank" rel="noopener" className="btn btn-secondary btn-sm" style={{ fontSize: "0.7rem" }}>
+                    🔗 Testnet Explorer
+                  </a>
+                </div>
               </div>
             </div>
           </div>

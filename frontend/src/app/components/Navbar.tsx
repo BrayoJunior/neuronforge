@@ -108,13 +108,28 @@ export default function Navbar() {
         params: [{ chainId: targetChain.chainId }],
       });
       setChainOk(true);
+      if (address) fetchBalance(address);
     } catch (e: any) {
-      if (e.code === 4902) {
-        await eth.request({
-          method: "wallet_addEthereumChain",
-          params: [targetChain],
-        });
-        setChainOk(true);
+      if (e.code === 4902 || e.code === 4001) {
+        try {
+          // Only pass fields MetaMask expects (strip 'network')
+          await eth.request({
+            method: "wallet_addEthereumChain",
+            params: [{
+              chainId: targetChain.chainId,
+              chainName: targetChain.chainName,
+              rpcUrls: targetChain.rpcUrls,
+              nativeCurrency: targetChain.nativeCurrency,
+              blockExplorerUrls: targetChain.blockExplorerUrls,
+            }],
+          });
+          setChainOk(true);
+          if (address) fetchBalance(address);
+        } catch (addError) {
+          console.error("Failed to add network:", addError);
+        }
+      } else {
+        console.error("Failed to switch network:", e);
       }
     }
   };

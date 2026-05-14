@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: neuronforge-api
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm run build && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PRIVATE_KEY
+        sync: false
+      - key: OG_RPC_URL
+        value: https://evmrpc-testnet.0g.ai
+      - key: OG_CHAIN_ID
+        value: "16601"
+      - key: OG_STORAGE_INDEXER_RPC
+        value: https://indexer-storage-testnet-turbo.0g.ai
+      - key: OG_COMPUTE_RPC
+        value: https://evmrpc-testnet.0g.ai
+      - key: AGENT_REGISTRY_ADDRESS
+        sync: false
+      - key: INFT_ADDRESS
+        sync: false
+      - key: FRONTEND_URL
+        sync: false

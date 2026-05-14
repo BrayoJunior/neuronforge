@@ -1,0 +1,15 @@
+{
+  "name": "neuronforge-skills",
+  "version": "1.0.0",
+  "description": "Custom OpenClaw Skills for NeuronForge — 0G-native agent capabilities",
+  "private": true,
+  "dependencies": {
+    "@0gfoundation/0g-ts-sdk": "latest",
+    "@0glabs/0g-serving-broker": "latest",
+    "ethers": "^6.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0"
+  }
+}

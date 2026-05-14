@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { getProvider } from "../utils/wallet";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -20,18 +21,6 @@ interface ChainConfig {
   nativeCurrency: { name: string; symbol: string; decimals: number };
   blockExplorerUrls: string[];
   network: string;
-}
-
-// Find MetaMask provider specifically, handles multiple wallet extensions
-function getProvider(): any {
-  if (typeof window === "undefined") return null;
-  const eth = (window as any).ethereum;
-  if (!eth) return null;
-  // If multiple providers, find MetaMask
-  if (eth.providers?.length) {
-    return eth.providers.find((p: any) => p.isMetaMask) || eth.providers[0];
-  }
-  return eth;
 }
 
 export default function Navbar() {

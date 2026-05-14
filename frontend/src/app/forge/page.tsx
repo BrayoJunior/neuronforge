@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { ethers } from "ethers";
+import { getProvider } from "../utils/wallet";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -443,7 +444,7 @@ export default function ForgePage() {
     if (!agent) return;
     
     // Check MetaMask
-    const eth = (window as any).ethereum;
+    const eth = getProvider();
     if (!eth) {
       setMessages(prev => [...prev, {
         role: "assistant",

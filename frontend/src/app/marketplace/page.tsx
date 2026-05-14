@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ethers } from "ethers";
+import { getProvider } from "../utils/wallet";
 
 const INFT_ADDRESS = "0xEC301d01Cf816010A2f1c4f8ef05726405277fA9";
 const INFT_ABI = [
@@ -104,7 +105,7 @@ export default function MarketplacePage() {
   });
 
   const handleMint = async (listing: Listing) => {
-    const eth = (window as any).ethereum;
+    const eth = getProvider();
     if (!eth) {
       alert("Please install MetaMask to mint agent INFTs");
       return;

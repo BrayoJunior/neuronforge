@@ -6,6 +6,9 @@
 [![Track 1](https://img.shields.io/badge/Track_1-Agentic_Infrastructure-8b5cf6?style=for-the-badge)](https://www.hackquest.io/hackathons/0G-APAC-Hackathon)
 [![License](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)](LICENSE)
 
+> 🌐 **Live Demo:** [neuronforge-orcin.vercel.app](https://neuronforge-orcin.vercel.app)  
+> 📝 **Backend API:** [neuronforge.onrender.com](https://neuronforge.onrender.com)
+
 ## What is NeuronForge?
 
 NeuronForge is an open-source **agent infrastructure platform** built on [0G Network](https://0g.ai). It implements a custom [OpenClaw](https://openclaw.ai)-compatible **ReAct (Reason + Act) runtime** that enables anyone to create autonomous AI agents with:
@@ -146,12 +149,20 @@ npm run dev
 cd ../frontend && npm run dev
 ```
 
-### Test Account
+### Test Account / Faucet Instructions
 
-- **Wallet**: `0x3BD54CA06ea6C17806898F2b22bfd709DD7b4343`
 - **Network**: 0G Galileo Testnet (Chain ID: 16602)
 - **RPC**: `https://evmrpc-testnet.0g.ai`
 - **Explorer**: [chainscan-galileo.0g.ai](https://chainscan-galileo.0g.ai)
+- **Faucet**: [faucet.0g.ai](https://faucet.0g.ai) — Request testnet OG tokens here
+- **MetaMask Setup**: Add 0G Galileo Testnet manually:
+  - Network Name: `0G Galileo Testnet`
+  - RPC URL: `https://evmrpc-testnet.0g.ai`
+  - Chain ID: `16602`
+  - Symbol: `OG`
+  - Explorer: `https://chainscan-galileo.0g.ai`
+
+> **Note:** Minting INFTs and marketplace interactions require MetaMask. The user signs all transactions client-side — no backend private key is used for user-facing operations.
 
 ## API Documentation
 
@@ -219,10 +230,12 @@ neuronforge/
 - [x] Smart contracts deployed (AgentRegistry + NeuronForgeINFT)
 - [x] 4 custom OpenClaw skills
 - [x] Agent builder UI with ReAct visualization
-- [x] INFT minting (agent tokenization)
+- [x] INFT minting (agent tokenization) — client-side MetaMask signing
 - [x] Real on-chain tool execution (send_og, check_balance, etc.)
 - [x] Live 0G Chain stats on landing page
-- [ ] INFT marketplace (on-chain listings + purchases)
+- [x] Agent Marketplace with MetaMask-powered minting
+- [x] List Agent form for marketplace
+- [x] Skills publish flow with 0G Storage
 - [ ] Multi-agent collaboration
 - [ ] Agent fine-tuning via 0G Compute
 

@@ -14,6 +14,9 @@ const FALLBACK_CHAIN = {
   network: "testnet",
 };
 
+// Both valid 0G chain IDs — accept either until backend confirms which one
+const VALID_0G_CHAINS = ["0x40da", "0x4115"]; // testnet=16602, mainnet=16661
+
 interface ChainConfig {
   chainId: string;
   chainName: string;
@@ -31,6 +34,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [pathname, setPathname] = useState("/");
   const [targetChain, setTargetChain] = useState<ChainConfig>(FALLBACK_CHAIN);
+  const [configLoaded, setConfigLoaded] = useState(false);
 
   useEffect(() => {
     setPathname(window.location.pathname);
@@ -43,10 +47,14 @@ export default function Navbar() {
       if (res.ok) {
         const config = await res.json();
         setTargetChain(config);
+        setConfigLoaded(true);
         console.log(`🌐 Backend network: ${config.network} (${config.chainName})`);
+      } else {
+        setConfigLoaded(true);
       }
     } catch {
       console.log("⚠️ Backend unreachable, using fallback testnet config");
+      setConfigLoaded(true);
     }
   };
 
@@ -94,7 +102,14 @@ export default function Navbar() {
       const eth = provider || getProvider();
       if (!eth) return;
       const chainId = await eth.request({ method: "eth_chainId" });
-      setChainOk(chainId.toLowerCase() === targetChain.chainId.toLowerCase());
+      const currentChain = chainId.toLowerCase();
+      
+      // If config not loaded yet, accept any valid 0G chain
+      if (!configLoaded) {
+        setChainOk(VALID_0G_CHAINS.includes(currentChain));
+      } else {
+        setChainOk(currentChain === targetChain.chainId.toLowerCase());
+      }
     } catch (e) {
       console.log("Chain check failed:", e);
     }

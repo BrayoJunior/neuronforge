@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: "NeuronForge — Decentralized Agent Infrastructure on 0G",
   description: "Build, orchestrate, persist, and trade autonomous AI agents using OpenClaw and 0G Network. The decentralized agent factory powered by INFTs.",
   keywords: ["AI agents", "0G Network", "OpenClaw", "INFT", "ERC-7857", "decentralized AI", "Web3"],
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

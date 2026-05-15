@@ -64,3 +64,6 @@
 
 ### May 12
 - Client-side MetaMask signing for INFT minting
+
+### May 15
+- Final documentation, demo video, and submission
